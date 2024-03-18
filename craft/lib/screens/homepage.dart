@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -16,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   final ImagePicker picker = ImagePicker();
   File? selectedImage;
   String? classificaitonData;
+  Position? currentPosition;
 
   Future pickAndCropImage(ImageSource source) async {
     final pickedImage =
@@ -44,14 +46,57 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       selectedImage = null;
       classificaitonData = null;
+      currentPosition = null;
     });
   }
 
-  void classifyImage() {
+  void classifyImage() async {
+    Position pos = await _determinePosition();
     setState(() {
+      currentPosition = pos;
       classificaitonData =
           "Flagstaff: Confidence 0.123\nBlack Mesa: Confidence 0.123\nKnaa: Confidence 0.123";
     });
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.lowest);
+
+    // TODO: Randomize the geoloation by a little bit
   }
 
   @override
@@ -202,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                     width: MediaQuery.of(context).size.width,
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Text(classificaitonData!),
+                      child: Text(currentPosition.toString()),
                     ),
                   )
                 : Container(),
@@ -219,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                 : Container(),
             selectedImage != null && classificaitonData != null
                 ? FilledButton(
-                    onPressed: () => {},
+                    onPressed: classifyImage,
                     child: const Text('Save Classification'))
                 : Container(),
             selectedImage != null && classificaitonData != null

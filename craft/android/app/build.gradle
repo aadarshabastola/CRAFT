@@ -27,6 +27,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.example.craft"
+    // might need to change to 33
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

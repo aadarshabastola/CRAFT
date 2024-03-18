@@ -32,6 +32,8 @@
 	<string>Allow access to select photos</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow access to take photo</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location when open.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
