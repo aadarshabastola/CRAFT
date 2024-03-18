@@ -29,7 +29,8 @@ class _HomePageState extends State<HomePage> {
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: true),
         IOSUiSettings(
-          title: 'Cropper',
+          aspectRatioLockEnabled: true,
+          title: 'Crop Image',
         ),
       ],
     );
