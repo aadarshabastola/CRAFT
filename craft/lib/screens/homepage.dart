@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:craft/screens/edit_results.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:page_transition/page_transition.dart';
 
 class HomePage extends StatefulWidget {
   static const String id = 'home';
@@ -94,9 +96,14 @@ class _HomePageState extends State<HomePage> {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.lowest);
+        desiredAccuracy: LocationAccuracy.low);
 
     // TODO: Randomize the geoloation by a little bit
+  }
+
+  void editClassification() {
+    Navigator.push(context,
+        PageTransition(child: EditResults(), type: PageTransitionType.fade));
   }
 
   @override
@@ -274,7 +281,7 @@ class _HomePageState extends State<HomePage> {
                 : Container(),
             selectedImage != null && classificaitonData != null
                 ? TextButton(
-                    onPressed: () => {},
+                    onPressed: editClassification,
                     child: const Text('Edit Classification'))
                 : Container(),
           ],
