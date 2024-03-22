@@ -21,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   String? classificaitonData;
   Position? currentPosition;
 
+  Map<String, Object>? classificatoinMap;
+
   Future pickAndCropImage(ImageSource source) async {
     final pickedImage =
         await picker.pickImage(source: source, imageQuality: 50);
@@ -54,6 +56,22 @@ class _HomePageState extends State<HomePage> {
 
   void classifyImage() async {
     Position pos = await _determinePosition();
+
+    classificatoinMap = {
+      'primaryClassification': 'Flagstaff',
+      'allClassificatoins': {
+        'Kana\'a': 0.23,
+        'Black Mesa': 0.01,
+        'Sosi': 0.20,
+        'Dogoszhi': 1.2,
+        'Flagstaff': 0.65,
+        'Tuysayan': 2.3,
+        'Kayenta': 4.5,
+      },
+      'lattitude': pos.latitude,
+      'longitude': pos.longitude,
+    };
+
     setState(() {
       currentPosition = pos;
       classificaitonData =
@@ -96,14 +114,18 @@ class _HomePageState extends State<HomePage> {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition(
+        // using the low locaiton accuracy makes accuracy of location 0-1000 m
         desiredAccuracy: LocationAccuracy.low);
-
-    // TODO: Randomize the geoloation by a little bit
   }
 
   void editClassification() {
-    Navigator.push(context,
-        PageTransition(child: EditResults(), type: PageTransitionType.fade));
+    Navigator.push(
+        context,
+        PageTransition(
+            child: EditResults(
+              classificatoinMap: classificatoinMap,
+            ),
+            type: PageTransitionType.fade));
   }
 
   @override
@@ -123,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                 child: FittedBox(
                   fit: BoxFit.contain,
                   child: Text(
-                    'Tuyscan White\nWare Classification',
+                    'Classify Sherd',
                     style: TextStyle(
                       fontFamily: 'Uber',
                       fontWeight: FontWeight.w700,
