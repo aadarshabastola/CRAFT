@@ -21,14 +21,18 @@ class _HomePageState extends State<HomePage> {
   String? classificaitonData;
   Position? currentPosition;
 
-  Map<String, Object>? classificatoinMap;
+  Map<String, dynamic>? classificatoinMap;
 
   Future pickAndCropImage(ImageSource source) async {
     final pickedImage =
         await picker.pickImage(source: source, imageQuality: 50);
 
+    if (pickedImage == null) {
+      return;
+    }
+
     CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: pickedImage!.path,
+      sourcePath: pickedImage.path,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
       uiSettings: [
         AndroidUiSettings(
@@ -41,8 +45,12 @@ class _HomePageState extends State<HomePage> {
       ],
     );
 
+    if (croppedFile == null) {
+      return;
+    }
+
     setState(() {
-      selectedImage = File(croppedFile!.path);
+      selectedImage = File(croppedFile.path);
     });
   }
 
@@ -118,14 +126,19 @@ class _HomePageState extends State<HomePage> {
         desiredAccuracy: LocationAccuracy.low);
   }
 
-  void editClassification() {
-    Navigator.push(
+  void editClassification() async {
+    Map<String, dynamic>? editedClassificatoin = await Navigator.push(
         context,
         PageTransition(
             child: EditResults(
               classificatoinMap: classificatoinMap,
             ),
             type: PageTransitionType.fade));
+
+    setState(() {
+      classificatoinMap = editedClassificatoin;
+      print(classificatoinMap);
+    });
   }
 
   @override
@@ -275,9 +288,16 @@ class _HomePageState extends State<HomePage> {
                             const BorderRadius.all(Radius.circular(5))),
                     width: MediaQuery.of(context).size.width,
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(currentPosition.toString()),
-                    ),
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          children: [
+                            Text(
+                                "Primary Classification: ${classificatoinMap!['primaryClassification'].toString()} [${classificatoinMap!['allClassificatoins']?[classificatoinMap!['primaryClassification'].toString()].toString()}]"),
+                            Text(
+                                "Location: ${classificatoinMap!['lattitude'].toStringAsFixed(4)}, ${classificatoinMap!['longitude'].toStringAsFixed(4)}"),
+                            const Text("Other Classifications:"),
+                          ],
+                        )),
                   )
                 : Container(),
             const SizedBox(

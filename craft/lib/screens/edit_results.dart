@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class EditResults extends StatefulWidget {
-  final Map<String, Object>? classificatoinMap;
+  final Map<String, dynamic>? classificatoinMap;
   const EditResults({super.key, required this.classificatoinMap});
 
   @override
@@ -21,8 +21,28 @@ class _EditResultsState extends State<EditResults> {
     'Kayenta',
   ];
 
+  late String classificationSelection;
+
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+
+  void onSaveClassificatoin(Map<String, dynamic>? classificatoinMap) async {
+    final GoogleMapController controller = await _controller.future;
+    LatLngBounds visibleRegion = await controller.getVisibleRegion();
+    LatLng centerLatLng = LatLng(
+      (visibleRegion.northeast.latitude + visibleRegion.southwest.latitude) / 2,
+      (visibleRegion.northeast.longitude + visibleRegion.southwest.longitude) /
+          2,
+    );
+
+    Map<String, dynamic>? newClassificationMap = classificatoinMap;
+    newClassificationMap?['lattitude'] = centerLatLng.latitude;
+    newClassificationMap?['longitude'] = centerLatLng.longitude;
+
+    if (mounted) {
+      Navigator.pop(context, newClassificationMap);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +115,7 @@ class _EditResultsState extends State<EditResults> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(140, 3, 142, 255),
+                      color: const Color.fromARGB(140, 3, 142, 255),
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
                         width: 2,
@@ -126,23 +146,8 @@ class _EditResultsState extends State<EditResults> {
             ),
             Center(
                 child: FilledButton(
-                    onPressed: () async {
-                      final GoogleMapController controller =
-                          await _controller.future;
-                      LatLngBounds visibleRegion =
-                          await controller.getVisibleRegion();
-                      LatLng centerLatLng = LatLng(
-                        (visibleRegion.northeast.latitude +
-                                visibleRegion.southwest.latitude) /
-                            2,
-                        (visibleRegion.northeast.longitude +
-                                visibleRegion.southwest.longitude) /
-                            2,
-                      );
-
-                      // randomize this latlng
-                      print(centerLatLng);
-                    },
+                    onPressed: () =>
+                        onSaveClassificatoin(widget.classificatoinMap),
                     child: const Text('Save'))),
             Center(
                 child: TextButton(
