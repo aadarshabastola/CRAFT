@@ -295,7 +295,7 @@ class _HomePageState extends State<HomePage> {
                                 "Primary Classification: ${classificatoinMap!['primaryClassification'].toString()} [${classificatoinMap!['allClassificatoins']?[classificatoinMap!['primaryClassification'].toString()].toString()}]"),
                             Text(
                                 "Location: ${classificatoinMap!['lattitude'].toStringAsFixed(4)}, ${classificatoinMap!['longitude'].toStringAsFixed(4)}"),
-                            const Text("Other Classifications:"),
+                            // const Text("Other Classifications:"),
                           ],
                         )),
                   )

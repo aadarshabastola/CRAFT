@@ -36,6 +36,11 @@ class _EditResultsState extends State<EditResults> {
     );
 
     Map<String, dynamic>? newClassificationMap = classificatoinMap;
+
+    if (classificationSelection.isNotEmpty) {
+      newClassificationMap?['primaryClassification'] = classificationSelection;
+    }
+
     newClassificationMap?['lattitude'] = centerLatLng.latitude;
     newClassificationMap?['longitude'] = centerLatLng.longitude;
 
@@ -72,6 +77,9 @@ class _EditResultsState extends State<EditResults> {
               height: 16,
             ),
             DropdownMenu(
+              onSelected: (selectedClassification) {
+                classificationSelection = selectedClassification.toString();
+              },
               width: MediaQuery.of(context).size.width - 32,
               label: const Text('Classification'),
               initialSelection:
